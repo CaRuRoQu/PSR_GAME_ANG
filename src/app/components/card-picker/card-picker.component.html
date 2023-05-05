@@ -1,0 +1,18 @@
+<div class="flex justify-center items-center flex-col space-y-8">
+    <div class="flex justify-center items-center space-x-4 ">
+      <div *ngFor="let card of cards" 
+           [ngClass]="{
+             'border-cyan-500': card === selected,
+             'border-gray-400': card !== selected
+           }"
+           class="relative w-16 h-16 cursor-pointer rounded-md overflow-hidden"
+           (click)="selected = card">           
+        <img src="{{card.image}}" alt="{{card.alt}}" class="absolute inset-0 object-cover w-full h-full">
+        <div *ngIf="card === selected" class="absolute inset-0 bg-green-300 bg-opacity-50"></div>
+      </div>
+      <div class="w-10 relative h-16 cursor-pointer rounded-md overflow-hidden">&nbsp;</div>
+      <div class="relative w-16 h-16 cursor-pointer rounded-md overflow-hidden">
+        <button (click)="submitSelection()" class="w-16 h-16 bg-cyan-800 text-white py-2 px-4 rounded-md shadow-sm hover:bg-cyan-600 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-opacity-50">Send move</button>
+      </div>
+    </div>
+  </div>
