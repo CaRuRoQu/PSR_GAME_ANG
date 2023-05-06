@@ -1,0 +1,17 @@
+<p class="jxr_linenumber p-4">For each win or tie, you will receive 5 points multiplied by the level. Conversely, for each loss, 10 points multiplied by the level will be deducted.
+    To win the round, you must reach a score of 3. If the computer's score reaches -3, you will lose the round.
+    If you win, you will receive 30 points multiplied by the level, and if you lose, that same amount will be deducted.
+    <br>
+    <!-- {{horizontalStatus}} -->
+    <br>
+</p>
+<div class="flex justify-between p-4">
+    <div *ngFor="let num of numbers" class="flex flex-col items-center">
+      <div class="w-6 h-6 rounded-full flex items-center justify-center bg-gray-200">{{ num }}</div>
+      <div class="border-t border-red-700 w-12 mt-2 border-4" 
+        [ngClass]="{'border-cyan-950': num === horizontalStatus}" 
+        *ngIf="num === horizontalStatus"></div>
+        <div class="border-t border-gray-300 w-12 mt-2 border-4" 
+        *ngIf="num !== horizontalStatus"></div>
+    </div>
+</div>

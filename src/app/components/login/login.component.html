@@ -1,0 +1,31 @@
+<h1 class="text-4xl px-4 py-2 mb-4 font-bold ">Welcome to Rock Paper Scissors</h1>
+<div class="w-2/2 px-4 py-2">
+  <h1 class="text-2xl font-bold mb-2">Rules</h1>
+  <p class="text-gray-700 leading-relaxed">
+    Rock, Paper, Scissors is a classic hand gesture game that is enjoyed by people of all ages. In this game, players choose one of three symbols - rock, paper, or scissors - to represent their move, and the outcome is determined based on the rules: rock beats scissors, scissors beats paper, and paper beats rock.
+In the version of the game with different levels of difficulty, players can challenge themselves to beat increasingly tougher opponents as they progress through the levels. The game offers five different levels of difficulty, each with its own unique characteristics and challenges. 
+  </p>
+</div>
+<!-- login.component.html -->
+<div class="flex">
+    <div class="w-1/2 bg-white p-8 mr-8 flex flex-col justify-center items-center">     
+        <app-hero></app-hero>
+    </div>    
+    <div class="w-1/2 bg-white p-8 flex flex-col justify-center items-center"> 
+            <!-- Centered Login Form -->   
+             <div class="w-96 hover:bg-cyan-800 focus:ring-4 focus:ring-cyan-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center bg-gradient-to-b from-gray-500 to-gray-700  border-gray-900 p-1s text-white">      
+                <p class=" text-lg px-4 py-2 mb-4">Log in to start playing the game!</p>
+                <h1 class="text-3xl font-semibold mb-4">Log in</h1>
+                <form>
+                  <input type="text" id="username" class="w-full px-4 py-2 mb-4 rounded border inline-flex items-center justify-center mr-2 transition-colors duration-150"  placeholder="Username">
+                  <input type="password" id="password" class="w-full px-4 py-2 mb-4 rounded border inline-flex items-center justify-center mr-2 transition-colors duration-150"  placeholder="Password">
+                  <button type="button" (click)="handleLogin()" class="w-full px-4 py-2 mb-2 rounded bg-cyan-500 text-white font-semibold focus:outline-none">Log In</button>
+                </form>
+              </div>     
+    </div>    
+  </div>
+
+
+
+  
+

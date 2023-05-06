@@ -1,0 +1,49 @@
+{
+    "gameData": {
+      "round": 1,
+      "level": 1,
+      "points": 100
+    },
+    "roundResults": {
+      "headerText": "",
+      "firstImage": "",
+      "firstStatus": false,
+      "secondImage": "",
+      "secondStatus": false
+    },
+    "cardsAnimated": [
+      {
+        "image": "../../../assets/Gifs/Stein.gif",
+        "alt": "Stone",
+        "value": "A"
+      },
+      {
+        "image": "../../../assets/Gifs/Papier.gif",
+        "alt": "Paper",
+        "value": "B"
+      },
+      {
+        "image": "../../../assets/Gifs/Schere.gif",
+        "alt": "Scissors",
+        "value": "C"
+      }
+    ],
+    "cards": [
+      {
+        "image": "../../../assets/Bilder/Stein-2.png",
+        "alt": "Stone",
+        "value": "A"
+      },
+      {
+        "image": "../../../assets/Bilder/Papier-2.png",
+        "alt": "Paper",
+        "value": "B"
+      },
+      {
+        "image": "../../../assets/Bilder/Schere-2.png",
+        "alt": "Scissors",
+        "value": "C"
+      }
+    ]
+  }
+  
