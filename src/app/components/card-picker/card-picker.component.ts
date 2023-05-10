@@ -16,7 +16,7 @@ export class CardPickerComponent {
   selected: any = null;
   @Output() selectionMade = new EventEmitter<string>();  
 
-// Funktion the sends a leter depending on selection. @ToDo Need to deactivate if nothing is selected.
+// Function the sends a leter depending on selection. @ToDo Need to deactivate if nothing is selected.
   submitSelection() {
     if (this.selected) {
       const selectedCard = this.selected.value;

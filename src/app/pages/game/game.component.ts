@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { FormsModule } from '@angular/forms';
+import { GamedataService } from '../../services/gamedata.service';
+
 
 interface GameData {
   round: number;
@@ -9,6 +10,13 @@ interface GameData {
   highScore: number;
 }
 
+interface GamedataUpdate {
+  name: string;
+  level: number;
+  highScore: number;
+  playedOn:string;
+  
+}
 interface RoundResults {
   headerText: string;
   firstImage: string;
@@ -24,13 +32,58 @@ interface RoundResults {
 })
 
 export class GameComponent {
+  gameDataArr: any 
   gameData: GameData = { round: 1, level: 1, points: 0 , highScore: 0 };
   roundResults: RoundResults = { headerText: '', firstImage: '', secondImage: '', firstStatus: false, secondStatus: false };
   @Input() horizontalStatus: number = 0;
   @Input() gameLost: boolean = false;
-  // @Input() gameOver: boolean = false;
+  @Input()
+  userName!: string; 
 
+  cardsAnimated = [
+    { image: '../../../assets/Gifs/Stein.gif', alt: 'Stone', value: 'A' },
+    { image: '../../../assets/Gifs/Papier.gif', alt: 'Paper', value: 'B' },
+    { image: '../../../assets/Gifs/Schere.gif', alt: 'Scissors', value: 'C' }
+  ];
+  cards = [
+    { image: '../../../assets/Bilder/Stein-2.png', alt: 'Stone', value: 'A' },
+    { image: '../../../assets/Bilder/Papier-2.png', alt: 'Paper', value: 'B' },
+    { image: '../../../assets/Bilder/Schere-2.png', alt: 'Scissors', value: 'C' }
+  ];
+
+    // A diferent way to return true or false.
   
+    checkEndGame(playerScore: number): boolean {
+      return playerScore < 0;
+    }
+    getAnimations(result: string, playerOne: string, computer: string) {
+  
+      switch (result) {
+        case 'W':
+          this.roundResults.headerText = "Player wins!";
+          this.roundResults.firstImage = this.cardsAnimated[this.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
+          this.gameData.points = this.gameData.points + (5 * this.gameData.level);
+          if (this.horizontalStatus < 3) {  this.horizontalStatus++; }
+  
+          break;
+        case 'L':
+          this.roundResults.headerText = "Computer wins!";
+          this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cardsAnimated[this.convertToNumber(computer)].image;
+          this.gameData.points = this.gameData.points - (10 * this.gameData.level);
+          if (this.horizontalStatus  > -3) {  this.horizontalStatus--; }
+          break;
+        case 'T':
+          this.roundResults.headerText = "It's a tie!";
+          this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
+          this.gameData.points = this.gameData.points + (5 * this.gameData.level) ;
+          break;
+        default:
+          throw new Error(`Invalid result: ${result}`);
+      }
+    } 
 
   // Function for the computer to select a move
 
@@ -40,10 +93,9 @@ export class GameComponent {
     return options[randomIndex];
   }
   
-// Function to find out who wins.
+  // Function to find out who wins.
   rockPaperScissors(player: string, computer: string): string {
     if (player === computer) {
-
       return "T";
     } else if (
       (player === 'A' && computer === 'C') ||
@@ -70,41 +122,7 @@ export class GameComponent {
     }
   }
 
-  getAnimations(result: string, playerOne: string, computer: string) {
   
-    switch (result) {
-      case 'W':
-        this.roundResults.headerText = "Player wins!";
-        this.roundResults.firstImage = this.cardsAnimated[this.convertToNumber(playerOne)].image;
-        this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
-        this.gameData.points = this.gameData.points + (5 * this.gameData.level);
-        if (this.horizontalStatus < 3) {  this.horizontalStatus++; }
-
-        break;
-      case 'L':
-        this.roundResults.headerText = "Computer wins!";
-        this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
-        this.roundResults.secondImage = this.cardsAnimated[this.convertToNumber(computer)].image;
-        this.gameData.points = this.gameData.points - (10 * this.gameData.level);
-        if (this.horizontalStatus  > -3) {  this.horizontalStatus--; }
-        break;
-      case 'T':
-        this.roundResults.headerText = "It's a tie!";
-        this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
-        this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
-        this.gameData.points = this.gameData.points + (5 * this.gameData.level) ;
-        break;
-      default:
-        throw new Error(`Invalid result: ${result}`);
-    } 
-
-  } 
-  
-  // A diferent way to return true or false.
-  
-  checkEndGame(playerScore: number): boolean {
-    return playerScore < 0;
-  }
 
   roundWonOrLost(text: string) {
     const modal = document.createElement('div');
@@ -117,13 +135,13 @@ export class GameComponent {
           <div class="flex justify-between items-center pb-3">
             <p class="text-2xl font-bold">${text}</p>
             <div class="modal-close cursor-pointer z-50">
-              <svg class="fill-current text-black" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
+              <svg class="fill-current text-cyan-950" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
                 <path d="M18 1.5l-1.5-1.5-7.5 7.5-7.5-7.5-1.5 1.5 7.5 7.5-7.5 7.5 1.5 1.5 7.5-7.5 7.5 7.5 1.5-1.5-7.5-7.5z"/>
               </svg>
             </div>
           </div>
           <div class="text-center">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+            <button class="bg-cyan-800 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">
               OK
             </button>
           </div>
@@ -147,15 +165,15 @@ export class GameComponent {
 
   checkLevelStatus(): string {
     if (this.horizontalStatus === -3) {
-      // take 30 point away.
-      this.gameData.points = this.gameData.points - (30 * this.gameData.level);
+      // take 50 point away.
+      this.gameData.points = this.gameData.points - (50 * this.gameData.level);
       this.horizontalStatus = 0;
       this.gameData.round = 0;
       this.roundWonOrLost("Unfortunately, you have lost this level. You will lose " + (30 * this.gameData.level) + " points. Better luck next time!");
 
       return 'l'; // player lost the round
     } else if (this.horizontalStatus === 3) {
-      // Add 30 points to his score and move to next round.
+      // Add 50 points to his score and move to next round.
       this.gameData.points = this.gameData.points +  (50 * this.gameData.level);
       this.horizontalStatus = 0;      
       this.gameData.round = 0;
@@ -197,32 +215,38 @@ export class GameComponent {
     this.gameLost = this.checkEndGame(this.gameData.points);
 
     // console.log('gameData', this.gameData.points);
-  }  
+  } 
 
+    Retry(): void {
+      const gameRetry = this.setgameData();
+      this.router.navigate(['/game']);
+    }   
 
+    SaveAndPlayAgain($event: any): void {
 
-    SaveGame($gameData: any): void {
-      console.log('$gameData', $gameData);
+      console.log('Emmited SaveAndPlayAgain', $event);
+        const formattedGameData: GamedataUpdate = {
 
-      // Send the data to the database. and quit
-
-      this.router.navigate(['/']);
+          name: $event,
+          level: this.gameData.level,
+          highScore: this.gameData.highScore,
+          playedOn: new Date().toISOString(),
+          
+        };
+            
+      this.gamedataService.addGameRecord(formattedGameData).subscribe(() => {
+        console.log('Game data added successfully.');
+      });
+      const gameRetry = this.setgameData();
+      this.router.navigate(['/game']);
     }
-
- 
-    
-    SaveAndPlayAgain($gameData: any): void {
-      console.log('$gameData', $gameData);
-      // Send the data to the database. and restart.
-      const gameRestart = this.setgameData();
-    } 
 
   // Set the game Data properties
   setgameData(): void {
     this.gameData.level = 1;
     this.gameData.round = 0;
-    this.gameData.points = 100;
-    this.gameData.highScore = 0;
+    this.gameData.points = 50;
+    this.gameData.highScore = this.gameData.points;
     this.horizontalStatus = 0 ;
     this.roundResults.firstImage = '';
     this.roundResults.secondImage = '';
@@ -230,24 +254,8 @@ export class GameComponent {
     this.gameLost = false;
   }
 
-  cardsAnimated = [
-    { image: '../../../assets/Gifs/Stein.gif', alt: 'Stone', value: 'A' },
-    { image: '../../../assets/Gifs/Papier.gif', alt: 'Paper', value: 'B' },
-    { image: '../../../assets/Gifs/Schere.gif', alt: 'Scissors', value: 'C' }
-  ];
-  cards = [
-    { image: '../../../assets/Bilder/Stein-2.png', alt: 'Stone', value: 'A' },
-    { image: '../../../assets/Bilder/Papier-2.png', alt: 'Paper', value: 'B' },
-    { image: '../../../assets/Bilder/Schere-2.png', alt: 'Scissors', value: 'C' }
-  ];
-
- 
-  constructor(private router: Router) { }
-
+  constructor(private router: Router, private gamedataService: GamedataService) { }
   ngOnInit(): void {
     this.setgameData();
-
-    // this.setRoundResults();
-    // this.SetHorizontalStatus();
   }
 }

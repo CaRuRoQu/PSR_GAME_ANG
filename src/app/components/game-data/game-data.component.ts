@@ -17,13 +17,4 @@ export class CardActionComponent {
   @Input() gameData!: GameData;
 
   constructor() { }
-
-  runSomething(): void {
-    console.log('test');
-    console.log('data', this.gameData);
-  }
-
-  ngOnInit(): void {
-    this.runSomething();
-  }
 }
