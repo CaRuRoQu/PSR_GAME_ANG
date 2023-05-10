@@ -9,7 +9,7 @@
           <ng-template #gameEnd>
             <div>
               <!-- content to display when GameStarted is false -->
-              <app-game-end [highScore]="gameData.highScore" [level]="gameData.level" (saveAndExit)="SaveGame(gameData)" (saveAndPlayAgain)="SaveAndPlayAgain(gameData)"></app-game-end>
+              <app-game-end [highScore]="gameData.highScore"  [level]="gameData.level" (retry)="Retry()" (saveAndPlayAgain)="SaveAndPlayAgain($event)"></app-game-end>
             </div>
           </ng-template>        
     </div>    

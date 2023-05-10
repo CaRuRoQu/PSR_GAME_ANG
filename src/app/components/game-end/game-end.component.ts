@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-
 @Component({
   selector: 'app-game-end',
   templateUrl: './game-end.component.html',
@@ -11,15 +10,17 @@ export class GameEndComponent {
   highScore!: number;
   @Input()
   level!: number;
-  @Output() saveAndPlayAgain = new EventEmitter<void>();
-  @Output() saveAndExit = new EventEmitter<void>();
-  playerName = '';
+  @Input()
+  userName!: string;
 
-  onSaveAndPlayAgain() {
-    this.saveAndPlayAgain.emit();
+  @Output() saveAndPlayAgain =  new EventEmitter<string>();  
+  @Output() retry = new EventEmitter<void>();  
+
+  onSave() {     
+      this.saveAndPlayAgain.emit(this.userName);
   }
 
-  onSaveAndExit() {
-    this.saveAndExit.emit();
+  onRetry() {
+    this.retry.emit();
   }
 }

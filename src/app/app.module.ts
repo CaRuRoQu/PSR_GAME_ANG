@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { RouterModule, Routes } from '@angular/router';
@@ -25,6 +26,9 @@ import { HorizontalLineComponent } from './components/horizontal-line/horizontal
 import { HistoryPageComponent } from './pages/history-page/history-page.component';
 import { RoundModalComponent } from './components/round-modal/round-modal.component';
 import { GameEndComponent } from './components/game-end/game-end.component';
+
+import { FormsModule } from '@angular/forms';
+
 
 const appRoutes: Routes = [
   {path: '' , component: StartComponent},
@@ -58,6 +62,8 @@ const appRoutes: Routes = [
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule, // Add HttpClientModule to imports
+    FormsModule,
     RouterModule.forRoot(appRoutes, {enableTracing: true}),
   ],
   providers: [],
