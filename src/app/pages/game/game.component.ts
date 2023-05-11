@@ -1,29 +1,11 @@
 import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { GamedataService } from '../../services/gamedata.service';
+import { GameData } from '../../game-data-interface';
+import { GamedataUpdate } from '../../game-data-update-interface';
+import { RoundResults } from '../../round-results-interface';
+import { GameService } from '../../game.service';
 
-
-interface GameData {
-  round: number;
-  level: number;
-  points: number;
-  highScore: number;
-}
-
-interface GamedataUpdate {
-  name: string;
-  level: number;
-  highScore: number;
-  playedOn:string;
-  
-}
-interface RoundResults {
-  headerText: string;
-  firstImage: string;
-  firstStatus: boolean;
-  secondImage: string;
-  secondStatus: boolean;
-}
 
 @Component({
   selector: 'app-game',
@@ -31,137 +13,125 @@ interface RoundResults {
   styleUrls: ['./game.component.css']
 })
 
-export class GameComponent {
-  gameDataArr: any 
+export class GameComponent { 
+  cardsAnimated: { image: string; alt: string; value: string; }[];
+  cards: any;
   gameData: GameData = { round: 1, level: 1, points: 0 , highScore: 0 };
-  roundResults: RoundResults = { headerText: '', firstImage: '', secondImage: '', firstStatus: false, secondStatus: false };
+  roundResults: RoundResults = { headerText: '', firstImage: '', secondImage: '',};
+
   @Input() horizontalStatus: number = 0;
   @Input() gameLost: boolean = false;
   @Input()
-  userName!: string; 
+  userName!: string;
 
-  cardsAnimated = [
-    { image: '../../../assets/Gifs/Stein.gif', alt: 'Stone', value: 'A' },
-    { image: '../../../assets/Gifs/Papier.gif', alt: 'Paper', value: 'B' },
-    { image: '../../../assets/Gifs/Schere.gif', alt: 'Scissors', value: 'C' }
-  ];
-  cards = [
-    { image: '../../../assets/Bilder/Stein-2.png', alt: 'Stone', value: 'A' },
-    { image: '../../../assets/Bilder/Papier-2.png', alt: 'Paper', value: 'B' },
-    { image: '../../../assets/Bilder/Schere-2.png', alt: 'Scissors', value: 'C' }
-  ];
+  constructor(private router: Router, private gamedataService: GamedataService, private gameService: GameService) {
+    this.cardsAnimated = gameService.cardsAnimated;
+    this.cards = gameService.cards;
+  }
 
-    // A diferent way to return true or false.
-  
-    checkEndGame(playerScore: number): boolean {
-      return playerScore < 0;
+  ngOnInit(): void {
+    this.setGameData();
+  }
+    /**
+     * Sets the initial game data and round results.
+     */
+    setGameData(): void {
+      this.gameData.level = 1;
+      this.gameData.round = 0;
+      this.gameData.points = 50;
+      this.gameData.highScore = this.gameData.points;
+      this.horizontalStatus = 0;
+      this.roundResults.firstImage = '';
+      this.roundResults.secondImage = '';
+      this.roundResults.headerText = "";
+      this.gameLost = false;
     }
+
+    /**
+     * Restarts the game by resetting the game data and navigating to the game page.
+     */
+    retry(): void {
+      this.setGameData();
+      this.router.navigate(['/game']);
+    }
+
+    /**
+     * Saves the game data, adds a game record, and restarts the game.
+     * @param $event The name of the player.
+     */
+
+    saveAndPlayAgain($event: any): void {
+      console.log('Emitted SaveAndPlayAgain', $event);
+      const formattedGameData: GamedataUpdate = {
+        name: $event,
+        level: this.gameData.level,
+        highScore: this.gameData.highScore,
+        playedOn: new Date().toISOString(),
+      };
+
+      this.gamedataService.addGameRecord(formattedGameData).subscribe(() => {
+        console.log('Game data added successfully.');
+      });
+
+      this.setGameData();
+      this.router.navigate(['/game']);
+    }
+
+    /**
+     * Updates the game animations and scores based on the result.
+     * @param result The result of the game ('W' for win, 'L' for loss, 'T' for tie).
+     * @param playerOne The player's move.
+     * @param computer The computer's move.
+     */
+
     getAnimations(result: string, playerOne: string, computer: string) {
-  
       switch (result) {
         case 'W':
           this.roundResults.headerText = "Player wins!";
-          this.roundResults.firstImage = this.cardsAnimated[this.convertToNumber(playerOne)].image;
-          this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
+          this.roundResults.firstImage = this.cardsAnimated[this.gameService.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cards[this.gameService.convertToNumber(computer)].image;
           this.gameData.points = this.gameData.points + (5 * this.gameData.level);
           if (this.horizontalStatus < 3) {  this.horizontalStatus++; }
-  
           break;
         case 'L':
           this.roundResults.headerText = "Computer wins!";
-          this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
-          this.roundResults.secondImage = this.cardsAnimated[this.convertToNumber(computer)].image;
+          this.roundResults.firstImage = this.cards[this.gameService.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cardsAnimated[this.gameService.convertToNumber(computer)].image;
           this.gameData.points = this.gameData.points - (10 * this.gameData.level);
           if (this.horizontalStatus  > -3) {  this.horizontalStatus--; }
           break;
         case 'T':
           this.roundResults.headerText = "It's a tie!";
-          this.roundResults.firstImage = this.cards[this.convertToNumber(playerOne)].image;
-          this.roundResults.secondImage = this.cards[this.convertToNumber(computer)].image;
-          this.gameData.points = this.gameData.points + (5 * this.gameData.level) ;
+          this.roundResults.firstImage = this.cards[this.gameService.convertToNumber(playerOne)].image;
+          this.roundResults.secondImage = this.cards[this.gameService.convertToNumber(computer)].image;
+          this.gameData.points = this.gameData.points + (5 * this.gameData.level);
           break;
         default:
           throw new Error(`Invalid result: ${result}`);
       }
-    } 
-
-  // Function for the computer to select a move
-
-  computerSelection() {
-    const options = ['A', 'B', 'C'];
-    const randomIndex = Math.floor(Math.random() * options.length);
-    return options[randomIndex];
-  }
-  
-  // Function to find out who wins.
-  rockPaperScissors(player: string, computer: string): string {
-    if (player === computer) {
-      return "T";
-    } else if (
-      (player === 'A' && computer === 'C') ||
-      (player === 'B' && computer === 'A') ||
-      (player === 'C' && computer === 'B')
-    ) {
-      return "W";
-    } else {
-      return "L";
     }
+
+  // Send the selected card to the function.
+
+  handleSelection($event: any): void {
+    const computerMove = this.gameService.computerSelection();
+    this.gameData.round++;
+
+    const playerMove = $event;
+
+    // Determine the winner
+    const winner = this.gameService.rockPaperScissors(playerMove, computerMove);
+
+    // Get animations and update game data
+    this.getAnimations(winner, playerMove, computerMove);
+
+    const levelStatus = this.checkLevelStatus();
+    this.gameData.highScore = this.gameService.updateHighScore(this.gameData.highScore, this.gameData.points);
+
+    this.gameLost = this.gameService.checkEndGame(this.gameData.points);
   }
 
-
-   convertToNumber(str: string): number {
-    switch (str) {
-      case 'A':
-        return 0;
-      case 'B':
-        return 1;
-      case 'C':
-        return 2;
-      default:
-        throw new Error(`Invalid input: ${str}`);
-    }
-  }
-
-  
-
-  roundWonOrLost(text: string) {
-    const modal = document.createElement('div');
-    modal.classList.add('fixed', 'inset-0', 'z-50', 'flex', 'items-center', 'justify-center');
-  
-    modal.innerHTML = `
-      <div class="absolute inset-0 bg-gray-900 opacity-75"></div>
-      <div class="modal-container bg-white w-11/12 md:max-w-md mx-auto rounded shadow-lg z-50 overflow-y-auto">
-        <div class="modal-content py-4 text-left px-6">
-          <div class="flex justify-between items-center pb-3">
-            <p class="text-2xl font-bold">${text}</p>
-            <div class="modal-close cursor-pointer z-50">
-              <svg class="fill-current text-cyan-950" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18">
-                <path d="M18 1.5l-1.5-1.5-7.5 7.5-7.5-7.5-1.5 1.5 7.5 7.5-7.5 7.5 1.5 1.5 7.5-7.5 7.5 7.5 1.5-1.5-7.5-7.5z"/>
-              </svg>
-            </div>
-          </div>
-          <div class="text-center">
-            <button class="bg-cyan-800 hover:bg-cyan-600 text-white font-bold py-2 px-4 rounded">
-              OK
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  
-    document.body.appendChild(modal);
-  
-    const closeButton = modal.querySelector('.modal-close');
-    closeButton?.addEventListener('click', () => {
-      modal.remove();
-    });
-  
-    const okButton = modal.querySelector('.modal-content button');
-    okButton?.addEventListener('click', () => {
-      modal.remove();
-    });
-  }
-  
+  // It checks if the level should be deducted or advanced. Issue or deduct points is aplicable.
 
   checkLevelStatus(): string {
     if (this.horizontalStatus === -3) {
@@ -169,7 +139,7 @@ export class GameComponent {
       this.gameData.points = this.gameData.points - (50 * this.gameData.level);
       this.horizontalStatus = 0;
       this.gameData.round = 0;
-      this.roundWonOrLost("Unfortunately, you have lost this level. You will lose " + (30 * this.gameData.level) + " points. Better luck next time!");
+      this.gameService.roundWonOrLost("Unfortunately, you have lost this level. You will lose " + (30 * this.gameData.level) + " points. Better luck next time!");
 
       return 'l'; // player lost the round
     } else if (this.horizontalStatus === 3) {
@@ -177,85 +147,11 @@ export class GameComponent {
       this.gameData.points = this.gameData.points +  (50 * this.gameData.level);
       this.horizontalStatus = 0;      
       this.gameData.round = 0;
-      this.roundWonOrLost("You have won this level! Congratulations! You will now proceed to the next level. You will receive " + (50 * this.gameData.level) + " points for your accomplishment.");
+      this.gameService.roundWonOrLost("You have won this level! Congratulations! You will now proceed to the next level. You will receive " + (50 * this.gameData.level) + " points for your accomplishment.");
       this.gameData.level++;
       return 'w'; // player won the round
     } else {
       return 't'; // game continues.
     }
-  }  
-
-  updateHighScore(score: number, highScore: number): number {
-    if (score > highScore) {
-      return score;
-    } else {
-      return highScore;
-    }
-  }  
-
-  // Send the selection.s
-  handleSelection($event: any): void {
-
-    const computermove = this.computerSelection();
-    this.gameData.round++;
-    const playermove = $event;
-    console.log('Emmited', $event);
-    // this should return w, l, t,
-
-    // const headerText[] = [''}
-    const winner = this.rockPaperScissors(playermove, computermove);
-
-    this.getAnimations(winner, playermove, computermove);
-
-    // console.log('playermove',playermove ,'computermove',computermove , 'winner', winner); 
-    
-    const levelStaus = this.checkLevelStatus();
-    this.gameData.highScore = this.updateHighScore(this.gameData.highScore, this.gameData.points);
-
-    this.gameLost = this.checkEndGame(this.gameData.points);
-
-    // console.log('gameData', this.gameData.points);
-  } 
-
-    Retry(): void {
-      const gameRetry = this.setgameData();
-      this.router.navigate(['/game']);
-    }   
-
-    SaveAndPlayAgain($event: any): void {
-
-      console.log('Emmited SaveAndPlayAgain', $event);
-        const formattedGameData: GamedataUpdate = {
-
-          name: $event,
-          level: this.gameData.level,
-          highScore: this.gameData.highScore,
-          playedOn: new Date().toISOString(),
-          
-        };
-            
-      this.gamedataService.addGameRecord(formattedGameData).subscribe(() => {
-        console.log('Game data added successfully.');
-      });
-      const gameRetry = this.setgameData();
-      this.router.navigate(['/game']);
-    }
-
-  // Set the game Data properties
-  setgameData(): void {
-    this.gameData.level = 1;
-    this.gameData.round = 0;
-    this.gameData.points = 50;
-    this.gameData.highScore = this.gameData.points;
-    this.horizontalStatus = 0 ;
-    this.roundResults.firstImage = '';
-    this.roundResults.secondImage = '';
-    this.roundResults.headerText = "";
-    this.gameLost = false;
-  }
-
-  constructor(private router: Router, private gamedataService: GamedataService) { }
-  ngOnInit(): void {
-    this.setgameData();
   }
 }

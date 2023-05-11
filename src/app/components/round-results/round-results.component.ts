@@ -1,11 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { RoundResults } from '../../round-results-interface';
 
-interface RoundResults {  
-  headerText: string;  
-  firstImage: string;  
-  firstStatus: boolean; 
-  secondImage: string; 
-  secondStatus: boolean }
 
 @Component({
   selector: 'app-round-results',

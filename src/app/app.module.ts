@@ -28,6 +28,7 @@ import { RoundModalComponent } from './components/round-modal/round-modal.compon
 import { GameEndComponent } from './components/game-end/game-end.component';
 
 import { FormsModule } from '@angular/forms';
+import { GameService } from './game.service';
 
 
 const appRoutes: Routes = [
@@ -38,6 +39,7 @@ const appRoutes: Routes = [
 
 ]
 @NgModule({
+  
   declarations: [
     AppComponent,
     LoginComponent,
@@ -66,7 +68,8 @@ const appRoutes: Routes = [
     FormsModule,
     RouterModule.forRoot(appRoutes, {enableTracing: true}),
   ],
-  providers: [],
+
+  providers: [GameService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
